@@ -53,26 +53,27 @@ export function selectSmart(user, count = 10) {
   }, Math.min(count, ALL_QUESTIONS.length));
 }
 
-export function dueReviewCount(user) {
-  return ALL_QUESTIONS.filter((q) => {
-    const srs = user.questionSrs?.[q.id];
-    if (!srs) return false;
-    return isDue(srs) || srs.lastResult === "wrong";
-  }).length;
+// 「復習すべき」判定：期日到来／直近不正解／正解はしたが迷いが長かった（当てずっぽうの疑いあり）
+function needsReview(srs) {
+  if (!srs) return false;
+  return isDue(srs) || srs.lastResult === "wrong" || srs.lastResult === "hesitant";
 }
 
-// 苦手克服モード：SRS上「復習期日が来ている」問題、または直近不正解の問題のみ
+export function dueReviewCount(user) {
+  return ALL_QUESTIONS.filter((q) => needsReview(user.questionSrs?.[q.id])).length;
+}
+
+// 苦手克服モード：SRS上「復習期日が来ている」問題、直近不正解の問題、
+// および「正解だが迷いが長く当てずっぽうの疑いがある」問題を対象にする
 export function selectReview(user, count = 20) {
-  const dueOrWrong = ALL_QUESTIONS.filter((q) => {
-    const srs = user.questionSrs?.[q.id];
-    if (!srs) return false;
-    return isDue(srs) || srs.lastResult === "wrong";
-  });
-  if (dueOrWrong.length === 0) return [];
-  return weightedSampleWithoutReplacement(dueOrWrong, (q) => {
+  const targets = ALL_QUESTIONS.filter((q) => needsReview(user.questionSrs?.[q.id]));
+  if (targets.length === 0) return [];
+  return weightedSampleWithoutReplacement(targets, (q) => {
     const srs = user.questionSrs[q.id];
-    return srs.lastResult === "wrong" ? 3 : 1.5;
-  }, Math.min(count, dueOrWrong.length));
+    if (srs.lastResult === "wrong") return 3;
+    if (srs.lastResult === "hesitant") return 2.2;
+    return 1.5;
+  }, Math.min(count, targets.length));
 }
 
 // カテゴリ集中学習：指定した部（part）または項目（item）から出題

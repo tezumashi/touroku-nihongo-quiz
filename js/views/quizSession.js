@@ -7,6 +7,20 @@ import { pickCorrectMessage, pickWrongMessage, comboMessage, BADGES } from "../g
 import { ITEMS, PARTS, getPart } from "../../data/curriculum.js";
 import { mascotMood, mascotMessage, mascotBlock } from "../mascot.js";
 
+// 長文穴埋め形式の設問で、文章中の該当箇所（空欄番号や下線部の語句）をハイライト表示する
+function renderPassage(q) {
+  if (!q.passage) return "";
+  let html = escapeHtml(q.passage);
+  if (q.blankLabel) {
+    const escapedLabel = escapeHtml(q.blankLabel);
+    html = html.replace(escapedLabel, `<mark class="passage-blank">${escapedLabel}</mark>`);
+  }
+  return `<div class="passage-card card">
+    <div class="passage-label">📄 次の文章を読み、下の問いに答えよ</div>
+    <p class="passage-text">${html}</p>
+  </div>`;
+}
+
 function buildQuestionList(mode, user, params) {
   const limit = Number(params.get("limit")) || undefined;
   if (mode === "smart") return selectSmart(user, limit || 10);
@@ -66,10 +80,13 @@ export function renderQuizSession(root, params) {
     return `<div class="quiz-timer ${warn}">⏱ ${m}:${s}</div>`;
   }
 
+  let questionShownAt = Date.now();
+
   function renderQuestion() {
     const q = questions[idx];
     const part = getPart(q.part);
     const { choices, correctIndex } = currentChoicesCache();
+    questionShownAt = Date.now();
     root.innerHTML = `
       <div class="quiz-stage">
         <div class="quiz-top">
@@ -82,6 +99,7 @@ export function renderQuizSession(root, params) {
           <span class="muted small">第${q.item}項目：${escapeHtml(ITEMS[q.item].name)}</span>
           <span class="muted small quiz-count">${idx + 1} / ${questions.length}</span>
         </div>
+        ${renderPassage(q)}
         <div class="quiz-question card">
           <p>${escapeHtml(q.q)}</p>
         </div>
@@ -108,6 +126,7 @@ export function renderQuizSession(root, params) {
     if (root.dataset.locked === "1") return;
     root.dataset.locked = "1";
     const isCorrect = chosenIndex === correctIndex;
+    const elapsedSeconds = (Date.now() - questionShownAt) / 1000;
     comboCount = isCorrect ? comboCount + 1 : 0;
     if (isCorrect) correctCount += 1;
     else wrongList.push({ q, chosen: choices[chosenIndex] });
@@ -125,7 +144,7 @@ export function renderQuizSession(root, params) {
       else if (i === chosenIndex) btn.classList.add("choice-wrong");
     });
 
-    const { user: updatedUser, xpGained, newBadges } = answerQuestion(username, { question: q, isCorrect, comboCount });
+    const { user: updatedUser, xpGained, newBadges, isHesitant: hesitant } = answerQuestion(username, { question: q, isCorrect, comboCount, elapsedSeconds });
     user = updatedUser;
     totalXp += xpGained;
 
@@ -146,6 +165,7 @@ export function renderQuizSession(root, params) {
         <span class="feedback-xp">+${xpGained}XP</span>
       </div>
       ${combo ? `<div class="combo-msg">${combo}</div>` : ""}
+      ${hesitant ? `<div class="hesitant-note">⏳ 迷った末の正解のようですね。この問題はまだ「復習リスト」に残しておきます。</div>` : ""}
       <div class="feedback-exp"><strong>正解：</strong>${escapeHtml(q.correct)}<br>${escapeHtml(q.exp)}</div>
       ${badgeHtml}
       <button class="btn btn-primary btn-block" id="next-btn">${idx + 1 >= questions.length ? "結果を見る" : "次の問題へ"}</button>
@@ -216,6 +236,7 @@ export function renderQuizSession(root, params) {
           <div class="card-title">間違えた問題（${wrongList.length}問）</div>
           ${wrongList.map(({ q, chosen }) => `
             <div class="wrong-item">
+              ${q.passage ? `<div class="muted small wrong-passage">${escapeHtml(q.passage)}</div>` : ""}
               <div class="wrong-q">${escapeHtml(q.q)}</div>
               <div class="muted small">あなたの回答：${escapeHtml(chosen)}</div>
               <div class="wrong-correct">正解：${escapeHtml(q.correct)}</div>

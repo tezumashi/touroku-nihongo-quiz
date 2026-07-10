@@ -197,6 +197,11 @@ button { font-family: inherit; }
 .tag { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 10px; }
 .quiz-count { margin-left: auto; }
 .quiz-question { font-size: 17px; line-height: 1.6; font-weight: 600; }
+.passage-card { background: #faf8f2; border: 1px solid var(--border); }
+.passage-label { font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.02em; }
+.passage-text { font-size: 14.5px; line-height: 1.9; white-space: pre-wrap; }
+.passage-blank { background: #ffe4b8; color: #7a4a00; font-weight: 700; padding: 1px 4px; border-radius: 4px; }
+.wrong-passage { line-height: 1.6; margin-bottom: 6px; padding: 8px; background: #faf8f2; border-radius: 8px; }
 .quiz-choices { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
 .choice-btn {
   display: flex; align-items: center; gap: 10px; text-align: left;
@@ -215,6 +220,7 @@ button { font-family: inherit; }
 .feedback-head { display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 6px; }
 .feedback-xp { margin-left: auto; color: var(--accent); font-size: 13px; }
 .combo-msg { font-weight: 700; color: var(--accent); margin-bottom: 8px; font-size: 13px; }
+.hesitant-note { background: #fff4dd; border: 1px solid #f0d99a; border-radius: 10px; padding: 8px 10px; font-size: 12.5px; margin-bottom: 10px; color: #7a5a17; }
 .feedback-exp { font-size: 13px; line-height: 1.6; margin-bottom: 10px; }
 .badge-toast { margin-bottom: 10px; }
 .badge-toast-item { background: #fff4dd; border: 1px solid #f0d99a; border-radius: 10px; padding: 8px 10px; font-size: 12.5px; margin-bottom: 6px; font-weight: 700; }
@@ -372,6 +378,8 @@ button { font-family: inherit; }
 .mock-history-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px dashed var(--border); }
 
 /* --- Achievements --- */
+.badge-category { margin-bottom: 20px; }
+.badge-category-head { display: flex; justify-content: space-between; align-items: baseline; font-weight: 700; font-size: 14px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--border); }
 .badge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .badge-card { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 14px; text-align: center; }
 .badge-card.locked { opacity: 0.4; filter: grayscale(1); }

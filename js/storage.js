@@ -66,9 +66,11 @@ function defaultUser(username) {
     totals: { answered: 0, correct: 0, studySeconds: 0 },
     dailyLog: {}, // dateISO -> {answered, correct, seconds}
     itemStats: {}, // itemNo -> {asked, correct}
-    questionSrs: {}, // questionId -> {box, dueDate, seen, correct, wrong, lastResult}
+    questionSrs: {}, // questionId -> {box, dueDate, seen, correct, wrong, hesitant, lastResult}
     badges: [],
     mockResults: [],
+    timeFlags: { earlyBird: false, nightOwl: false }, // 早起き・夜型バッジ用
+    responseTimes: [], // 直近の正解時の回答所要秒数（迷い検出の個人基準値に使用）
   };
 }
 
