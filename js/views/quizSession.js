@@ -35,6 +35,8 @@ function buildQuestionList(mode, user, params) {
 }
 
 export function renderQuizSession(root, params) {
+  // 同じ#view要素を再利用して新しいセッションを始める場合に備え、回答ロックを解除する。
+  root.dataset.locked = "0";
   const username = Storage.getCurrentUsername();
   let user = Storage.getUser(username);
   if (!user) { navigate("/onboarding"); return; }

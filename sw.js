@@ -1,4 +1,4 @@
-const CACHE = "tnq-cache-v1";
+const CACHE = "tnq-cache-v3";
 const ASSETS = [
   "./",
   "./index.html",
